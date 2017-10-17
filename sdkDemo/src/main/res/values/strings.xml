@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">P2PLibrary</string>
+    <string name="login">login</string>
+    <string name="loginout">loginout</string>
+    <string name="add">add device</string>
+    <string name="save">save</string>
+    <string name="link">Link</string>
+    <string name="play">play</string>
+    <string name="playing">playing...</string>
+    <string name="play_again">play again</string>
+    <string name="stop">stop</string>
+    <string name="delete">delete</string>
+    <string name="change">change</string>
+    <string name="session_is">Session ID:%s</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+    <string name="edit_did_hint">please input device did!</string>
+    <string name="edit_username_hint">please input username!</string>
+    <string name="edit_pwd_hint">please input password!</string>
+    <string name="wifi_name_hint">please input wifi name!</string>
+    <string name="wifi_pwd_hint">please input wifi password!</string>
+    <string name="permission_mic_tip">permission not support!</string>
+
+</resources>

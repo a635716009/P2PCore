@@ -1,0 +1,35 @@
+apply plugin: 'com.android.application'
+android {
+    compileSdkVersion project.ext.compileSdkVersion
+    buildToolsVersion project.ext.buildToolsVersion
+    defaultConfig {
+        applicationId project.ext.applicationId
+        minSdkVersion project.ext.minSdkVersion
+        targetSdkVersion project.ext.targetSdkVersion
+        versionCode project.ext.versionCode
+        versionName project.ext.versionName
+    }
+    buildTypes {
+        release {
+            zipAlignEnabled true
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable false
+            jniDebuggable false
+        }
+        debug {
+            zipAlignEnabled false
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable true
+            jniDebuggable true
+        }
+    }
+}
+
+dependencies {
+    compile project(':sdk')
+    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
+}
