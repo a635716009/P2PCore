@@ -1,9 +1,4 @@
 apply plugin: 'com.android.application'
-repositories {
-    maven {
-        url 'https://dl.bintray.com/cwy/IPCAMERA'
-    }
-}
 android {
     compileSdkVersion project.ext.compileSdkVersion
     buildToolsVersion project.ext.buildToolsVersion
@@ -32,10 +27,14 @@ android {
             jniDebuggable true
         }
     }
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
-//    compile project(':sdk')
-    compile 'com.bwcamera:p2pcore:1.0'
+    compile project(':sdk')
+//    compile 'com.bwcamera:p2pcore:1.0'
     compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
 }

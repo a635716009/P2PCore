@@ -204,20 +204,18 @@ public class DevActivity extends Activity implements View.OnClickListener {
     }
 
     private void play() {
+        m_fifoVideo.removeAll();
+        m_fifoAudio.removeAll();
         if (mDev.isPlaying) {
             m_bRunning = false;
             appendLog("正在关闭视频...");
             controler.devSdkSend(mDev.getDID(), TestXml.getStopVideoXml(mSessionId, liveStreamId));
-            m_fifoVideo.removeAll();
-            m_fifoAudio.removeAll();
             mDev.isPlaying = false;
             if (monitor != null)
                 monitor.setVisibility(View.INVISIBLE);
             if (playButton != null)
                 playButton.setText(R.string.play);
         } else {
-            m_fifoVideo.removeAll();
-            m_fifoAudio.removeAll();
             appendLog("正在开启视频...");
             controler.devSdkSend(mDev.getDID(), TestXml.getStartVideoXml(mSessionId));
             m_bRunning = true;
@@ -409,7 +407,6 @@ public class DevActivity extends Activity implements View.OnClickListener {
 
     private void iniAudioRecord() {
         if (!audioRecordInit) {
-//            int bufferSize = AudioRecord.getMinBufferSize(frequence, channelInConfig, audioEncoding);
             int bufferSize = 1920;
             audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequence, channelInConfig, audioEncoding, bufferSize);
             buffer = new byte[bufferSize];
@@ -644,9 +641,9 @@ public class DevActivity extends Activity implements View.OnClickListener {
 
     @Override
     protected void onDestroy() {
-        if (mDev != null && mDev.opened){
+        if (mDev != null && mDev.opened) {
             open();
-            mDev.opened=false;
+            mDev.opened = false;
         }
         controler.unInit();
         AppBus.getInstance().unregister(this);
@@ -664,8 +661,8 @@ public class DevActivity extends Activity implements View.OnClickListener {
         private SurfaceHolder holder;
         private ByteBuffer[] inputBuffers;
 
-        private long localStartTime=0;
-        private long streamStartTime=0;
+        private long localStartTime = 0;
+        private long streamStartTime = 0;
 
         private ThreadPlayVideo(SurfaceView s) {
             this.surface = s;
@@ -673,51 +670,47 @@ public class DevActivity extends Activity implements View.OnClickListener {
 
         @Override
         public void run() {
-            holder = surface.getHolder();
             try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            initDecoder();
-            if (mCodecInit) {
-                info = new MediaCodec.BufferInfo();
-                inputBuffers= mCodec.getInputBuffers();
-                while (m_bRunning) {
-                    AVFrameCallbackEvents events = m_fifoVideo.removeHead();
-                    if (events == null) {
-                        try {
-                            Thread.sleep(30);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        continue;
-                    }
-                    if(localStartTime==0) {
-                        localStartTime = System.currentTimeMillis();
-                        streamStartTime =events.getFrameHead().ts;
-                    }
-
-                    long playTime = events.getFrameHead().ts - streamStartTime;
-                    long clockTime = System.currentTimeMillis()-localStartTime;
-                    Log.d("Test==","PTS  "+ playTime +"   "+clockTime);
-                    if(playTime < clockTime){
-                    }
-                    byte[] videoData = events.getData();
-                    decode(videoData, 0, videoData.length,clockTime);
-                    try {
-                        Thread.sleep(30);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
                 if (mCodec != null) {
                     mCodec.stop();
                     mCodec.release();
+                    mCodec = null;
                 }
+                holder = surface.getHolder();
+                initDecoder();
+                if (mCodecInit) {
+                    info = new MediaCodec.BufferInfo();
+                    inputBuffers = mCodec.getInputBuffers();
+                    while (m_bRunning) {
+                        AVFrameCallbackEvents events = m_fifoVideo.removeHead();
+                        if (events == null) {
+                            Thread.sleep(30);
+                            continue;
+                        }
+                        if (localStartTime == 0) {
+                            localStartTime = System.currentTimeMillis();
+                            streamStartTime = events.getFrameHead().ts;
+                        }
+
+                        long playTime = events.getFrameHead().ts - streamStartTime;
+                        long clockTime = System.currentTimeMillis() - localStartTime;
+                        Log.d("Test==", "PTS  " + playTime + "   " + clockTime);
+                        if (playTime < clockTime) {
+                        }
+                        byte[] videoData = events.getData();
+                        decode(videoData, 0, videoData.length, clockTime);
+                        Thread.sleep(30);
+                    }
+                    if (mCodec != null) {
+                        mCodec.stop();
+                        mCodec.release();
+                        mCodec = null;
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-
         }
 
 
@@ -739,8 +732,7 @@ public class DevActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        private void decode(byte[] buf, int offset, int length,long pts) {
-
+        private void decode(byte[] buf, int offset, int length, long pts) {
             int inputBufferIndex = mCodec.dequeueInputBuffer(10000);
             if (inputBufferIndex >= 0) {
                 ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];

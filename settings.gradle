@@ -1,2 +1,2 @@
-//include  ':sdk'
-include  'sdkDemo'
+include  ':sdk'
+include  ':sdkDemo'
